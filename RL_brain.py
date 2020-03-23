@@ -5,7 +5,7 @@ import random as rd
 
 class QLearningTable:
 
-    def __init__(self, size, alpha=0.2, gamma=0.9, epsilon=0, q_table=None, agent=True):
+    def __init__(self, size, alpha=0.01, gamma=0.9, epsilon=0.5, q_table=None, agent = True):
 
         if q_table is None:
             q_table = {}
@@ -27,13 +27,14 @@ class QLearningTable:
 
     def choose_action(self, state):
         self.check_state_exist(state)
-        #action selection
+        # action selection
         if np.random.uniform() <= self.epsilon:
             # exploitation, choose best action
             value = max(self.q_table[state].values())
             action = self.get_action(state, value)
 
         else:
+            # exploration, choose random action
             action = rd.sample(self.q_table[state].keys(), 1)[0]
 
         return action
@@ -54,14 +55,13 @@ class QLearningTable:
         else:  # next state is terminal
             self.q_table[s][a] = r
 
-
     def check_state_exist(self, state):
         if state not in self.q_table:
             # append new state to q table
             self.q_table[state] = {}
             #print(state)
             for i in range(self.size):
-                if state[i] == '_':
+                if state[i] == '-':
                     self.q_table[state][i] = 0
 
     def output_q_table(self):

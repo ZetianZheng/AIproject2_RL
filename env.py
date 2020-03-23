@@ -9,7 +9,7 @@ class Board:
         self.board = self.create_board()
 
     def create_board(self):
-        return [['_'] * self.size for _ in range(self.size)]
+        return [['-'] * self.size for _ in range(self.size)]
 
     def draw_board(self):
 
@@ -29,7 +29,7 @@ class Board:
             return 'win','lost','draw','continue'
         """
 
-        if symbol == 'o':
+        if symbol == 'O':
             result = 'win'
         else:
             result = 'lost'
@@ -84,7 +84,7 @@ class Board:
             a -= 1
             b += 1
         for i in range(self.size):
-            if '_' not in self.board[i]:
+            if '-' not in self.board[i]:
                 return 'draw'
 
         return 'continue'
@@ -113,10 +113,10 @@ class Board:
     def step(self, action, agent = True):
         # action is a number represents location
         if agent:
-            symbol = 'o'
+            symbol = 'X'
             self.second_move(action)
         else:
-            symbol = 'x'
+            symbol = 'O'
             self.first_move(action)
 
         result = self.check_end(action, symbol)
@@ -138,12 +138,12 @@ class Board:
     def first_move(self, location):
         x = int(location / self.size)
         y = int(location % self.size)
-        self.board[x][y] = 'x'
+        self.board[x][y] = 'O'
 
     # 'o'
     def second_move(self, location):
         # our agent's turn
         x = int(location / self.size)
         y = int(location % self.size)
-        self.board[x][y] = 'o'
+        self.board[x][y] = 'X'
 
