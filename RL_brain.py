@@ -5,7 +5,7 @@ import random as rd
 
 class QLearningTable:
 
-    def __init__(self, size, alpha=0.2, gamma=0.9, epsilon=0, q_table=None, agent = 'first'):
+    def __init__(self, size, alpha=0.2, gamma=0.9, epsilon=0, q_table=None, agent=True):
 
         if q_table is None:
             q_table = {}

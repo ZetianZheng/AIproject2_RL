@@ -6,29 +6,15 @@ size = 16
 m = 8
 
 def get_q_table(filename):
-    q_table = {}
     f = open(filename, 'r')
-    lines = f.readlines()
-    for line in lines:
-        #line = line[:-1]
-        state = line.split(';')[0]
-        action_value = line.split(';')[1].split(',')
-        q_table[state] = {}
-        for i in range(len(action_value)-1):
-            action = action_value[i].split(':')[0][1]
-            value = action_value[i].split(':')[1][1:]
-            q_table[state][int(action)] = float(value)
+    q_table = eval(f.read())
+    f.close()
     return q_table
 
 def save_q_table(q_table,filename):
     f = open(filename, 'w+')
-    for state in q_table:
-        line = ''
-        line += state + '; '
-        for action in q_table[state]:
-            value = q_table[state][action]
-            line += str(action) + ': ' + str(value) + ', '
-        f.write(line + '\n')
+    f.write(str(q_table))
+    f.close()
 
 
 def update():
@@ -78,7 +64,7 @@ def update():
 
 
 if __name__ == "__main__":
-    #input_file = sys.argv[2]
+    input_file = sys.argv[2]
     output_file = sys.argv[2]
 
     board = Board(size, m)
