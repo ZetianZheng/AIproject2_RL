@@ -34,7 +34,7 @@ class Board:
         else:
             result = 'lost'
 
-        x = int(location / self.size)
+        x = int(location // self.size)
         y = int(location % self.size)
         # judge row
         count = 0
@@ -72,8 +72,11 @@ class Board:
             b += 1
 
         # judge cross left down to right up
-        a = x - small_one
-        b = y + small_one
+        a, b = x, y
+        while(a<self.size-1 and b>0):
+            a+=1
+            b-=1
+
         while a >= 0 and b <= self.size-1:
             if self.board[a][b] == symbol:
                 count += 1
@@ -83,6 +86,7 @@ class Board:
                 count = 0
             a -= 1
             b += 1
+
         for i in range(self.size):
             if '-' not in self.board[i]:
                 return 'draw'
@@ -134,13 +138,13 @@ class Board:
                 state += self.board[i][j]
         return state
 
-    # 'x'
+    # 'O'
     def first_move(self, location):
         x = int(location / self.size)
         y = int(location % self.size)
         self.board[x][y] = 'O'
 
-    # 'o'
+    # 'X'
     def second_move(self, location):
         # our agent's turn
         x = int(location / self.size)
