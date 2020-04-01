@@ -32,17 +32,22 @@ class Net(nn.Module):
 
 # Deep Q Network off-policy
 class DeepQNetwork(object):
-    def __init__(self, N_STATES, N_ACTIONS, load = False):
+    def __init__(self, N_STATES, N_ACTIONS, load = False, use_gpu = False):
         if load:
             self.load_net()
         else:
             self.eval_net, self.target_net = Net(N_STATES, N_ACTIONS), Net(N_STATES, N_ACTIONS)
+
+        if use_gpu:
+            self.eval_net = nn.DataParallel(self.eval_net.cuda())
+            self.target_net = nn.DataParallel(self.target_net.cuda())
+
         self.N_STATES = N_STATES
         self.N_ACTIONS = N_ACTIONS
 
         self.learn_step_counter = 0                                     # for target updating
         self.memory_counter = 0                                         # for storing memory
-        self.memory = np.zeros((MEMORY_CAPACITY, 2 * N_STATES+2))     # initialize memory
+        self.memory = np.zeros((MEMORY_CAPACITY, 2 * N_STATES+2))       # initialize memory
         self.optimizer = torch.optim.Adam(self.eval_net.parameters(), lr=LR)
         self.loss_func = nn.MSELoss()
 
@@ -111,3 +116,4 @@ class DeepQNetwork(object):
     def save_net(self):
         torch.save(self.eval_net, 'eval_net.pkl')
         torch.save(self.target_net, 'target_net.pkl')
+
