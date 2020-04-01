@@ -32,7 +32,7 @@ class Net(nn.Module):
 
 # Deep Q Network off-policy
 class DeepQNetwork(object):
-    def __init__(self, N_STATES, N_ACTIONS, load = False, use_gpu = False):
+    def __init__(self, N_STATES, N_ACTIONS, load = False, use_gpu = True):
         if load:
             self.load_net()
         else:
@@ -45,11 +45,13 @@ class DeepQNetwork(object):
         self.N_STATES = N_STATES
         self.N_ACTIONS = N_ACTIONS
 
-        self.learn_step_counter = 0                                     # for target updating
+        self.learn_step_counter = 1                                     # for target updating
         self.memory_counter = 0                                         # for storing memory
         self.memory = np.zeros((MEMORY_CAPACITY, 2 * N_STATES+2))       # initialize memory
         self.optimizer = torch.optim.Adam(self.eval_net.parameters(), lr=LR)
         self.loss_func = nn.MSELoss()
+
+        self.use_gpu = use_gpu
 
     def state_to_array(self,state):
         a = []
@@ -68,7 +70,7 @@ class DeepQNetwork(object):
         # input only one sample
         if np.random.uniform() < EPSILON:   # greedy
             actions_value = self.eval_net.forward(x)
-            action = torch.max(actions_value, 1)[1].data.numpy()
+            action = torch.max(actions_value, 1)[1].data.cpu().numpy()
             action = action[0]
         else:   # random
             action = np.random.randint(0, self.N_ACTIONS)
@@ -94,10 +96,16 @@ class DeepQNetwork(object):
         # sample batch transitions
         sample_index = np.random.choice(MEMORY_CAPACITY, BATCH_SIZE)
         b_memory = self.memory[sample_index, :]
-        b_s = torch.FloatTensor(b_memory[:, :self.N_STATES])
-        b_a = torch.LongTensor(b_memory[:, self.N_STATES:self.N_STATES+1].astype(int))
-        b_r = torch.FloatTensor(b_memory[:, self.N_STATES+1:self.N_STATES+2])
-        b_s_ = torch.FloatTensor(b_memory[:, -self.N_STATES:])
+        if self.use_gpu:
+            b_s = torch.cuda.FloatTensor(b_memory[:, :self.N_STATES])
+            b_a = torch.cuda.LongTensor(b_memory[:, self.N_STATES:self.N_STATES+1].astype(int))
+            b_r = torch.cuda.FloatTensor(b_memory[:, self.N_STATES+1:self.N_STATES+2])
+            b_s_ = torch.cuda.FloatTensor(b_memory[:, -self.N_STATES:])
+        else:
+            b_s = torch.FloatTensor(b_memory[:, :self.N_STATES])
+            b_a = torch.LongTensor(b_memory[:, self.N_STATES:self.N_STATES+1].astype(int))
+            b_r = torch.FloatTensor(b_memory[:, self.N_STATES+1:self.N_STATES+2])
+            b_s_ = torch.FloatTensor(b_memory[:, -self.N_STATES:])
 
         # q_eval w.r.t the action in experience
         q_eval = self.eval_net(b_s).gather(1, b_a)  # shape (batch, 1)

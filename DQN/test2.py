@@ -57,6 +57,6 @@ if __name__ == "__main__":
     board = Board(size,m)
     RL = DeepQNetwork(size**2,size**2)
 
-    train(1)
+    train(1000)
     RL.save_net()
     print('Finish')
