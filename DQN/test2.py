@@ -51,8 +51,8 @@ def train(time):
 
 
 if __name__ == "__main__":
-    size = 3
-    m = 3
+    size = 12
+    m = 6
     MEMORY_CAPACITY = 4000
     board = Board(size,m)
     RL = DeepQNetwork(size**2,size**2)
