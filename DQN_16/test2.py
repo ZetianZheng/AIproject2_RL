@@ -51,12 +51,12 @@ def train(time):
 
 
 if __name__ == "__main__":
-    size = 12
-    m = 6
+    size = 16
+    m = 8
     MEMORY_CAPACITY = 4000
     board = Board(size,m)
     RL = DeepQNetwork(size**2,size**2)
 
-    train(250)
+    train(500)
     RL.save_net()
     print('Finish')
